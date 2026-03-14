@@ -34,11 +34,6 @@ try:
 except ImportError:
     HAS_PIEXIF = False
 
-
-# ---------------------------------------------------------------------------
-# EXIF tag categories for organised output
-# ---------------------------------------------------------------------------
-
 DEVICE_TAGS = {
     "Make", "Model", "LensMake", "LensModel", "LensSpecification",
     "BodySerialNumber", "CameraOwnerName", "Software",
@@ -82,11 +77,6 @@ TECHNICAL_TAGS = {
     "Gamma", "PrintImageMatching",
 }
 
-
-# ---------------------------------------------------------------------------
-# GPS helpers
-# ---------------------------------------------------------------------------
-
 def _dms_to_decimal(dms, ref: str) -> float | None:
     try:
         if isinstance(dms[0], tuple):
@@ -101,7 +91,6 @@ def _dms_to_decimal(dms, ref: str) -> float | None:
         return round(decimal, 7)
     except Exception:
         return None
-
 
 def parse_gps(gps_info: dict) -> dict:
     result = {}
@@ -181,11 +170,6 @@ def parse_gps(gps_info: dict) -> dict:
 
     return result
 
-
-# ---------------------------------------------------------------------------
-# Reverse geocoding
-# ---------------------------------------------------------------------------
-
 def reverse_geocode(lat: float, lon: float) -> str:
     try:
         url = (f"https://nominatim.openstreetmap.org/reverse"
@@ -197,11 +181,6 @@ def reverse_geocode(lat: float, lon: float) -> str:
             return data.get("display_name", "-")
     except Exception:
         return "-"
-
-
-# ---------------------------------------------------------------------------
-# Value formatting
-# ---------------------------------------------------------------------------
 
 ORIENTATION_MAP = {
     1: "Normal (0°)",
@@ -263,7 +242,6 @@ LIGHT_SOURCE_MAP  = {
     20: "D55", 21: "D65", 22: "D75", 23: "D50",
     24: "ISO studio tungsten", 255: "Other",
 }
-
 
 def fmt_value(tag: str, value) -> str:
     if tag == "Orientation":
@@ -341,11 +319,6 @@ def fmt_value(tag: str, value) -> str:
             pass
     return str(value)
 
-
-# ---------------------------------------------------------------------------
-# Core extractor
-# ---------------------------------------------------------------------------
-
 def extract_exif(path: Path) -> dict:
     if not HAS_PIL:
         print("[!] Pillow not installed. Run: pip install Pillow piexif requests")
@@ -363,7 +336,6 @@ def extract_exif(path: Path) -> dict:
         "raw":       {},
     }
 
-    # File info
     stat = path.stat()
     result["file"] = {
         "Filename":  path.name,
@@ -446,11 +418,6 @@ def extract_exif(path: Path) -> dict:
 
     return result
 
-
-# ---------------------------------------------------------------------------
-# Output printer
-# ---------------------------------------------------------------------------
-
 SECTION_LABELS = {
     "file":      "FILE INFO",
     "device":    "DISPOSITIVO",
@@ -482,7 +449,6 @@ def print_results(data: dict, path: Path):
 
     print(f"\n{'═' * 60}\n")
 
-
 def save_results(data: dict, output_file: Path):
     lines = []
     for section, label in SECTION_LABELS.items():
@@ -496,11 +462,6 @@ def save_results(data: dict, output_file: Path):
             lines.append(f"{key:<30} {val}")
     output_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"[*] Saved : {output_file}")
-
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -560,7 +521,6 @@ Examples:
                 if len(args.images) > 1:
                     out = out.with_stem(f"{out.stem}_{path.stem}")
                 save_results(data, out)
-
 
 if __name__ == "__main__":
     main()
